@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">TestAppAnd</string>
+    <string name="title_products">Products</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_profile">User Profile</string>
+    <string name="nav_products">Products</string>
+    <string name="nav_favorites">Favorites</string>
+    <string name="nav_profile">Profile</string>
+    <string name="empty_favorites">No favorites yet</string>
+    <string name="welcome_profile">Welcome,</string>
+    <string name="favorite_items_label">Favorite Items</string>
+</resources>
