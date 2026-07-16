@@ -1,5 +1,7 @@
 package com.jmanrique.testappand.features.products
 
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewModelScope
 import com.jmanrique.testappand.core.BaseViewModel
 import com.jmanrique.testappand.core.UiState
@@ -22,6 +24,10 @@ class ProductsViewModel @Inject constructor(
     private val _productsState = MutableStateFlow<UiState<List<Product>>>(UiState.Loading)
     val productsState: StateFlow<UiState<List<Product>>> = _productsState
 
+
+    private val _events = MutableSharedFlow<UiEvent>()
+    val events = _events.asSharedFlow()
+
     private val _rawProducts = MutableStateFlow<List<Product>>(emptyList())
     private val _favorites = MutableStateFlow<List<Product>>(emptyList())
 
@@ -31,7 +37,7 @@ class ProductsViewModel @Inject constructor(
         combineProductsWithFavorites()
     }
 
-    private fun loadProducts() {
+    fun loadProducts() {
         executeUseCase(
             targetStateFlow = _productsState,
             useCaseCall = { getProductsUseCase.execute() },
@@ -66,7 +72,13 @@ class ProductsViewModel @Inject constructor(
 
     fun onFavoriteClick(product: Product) {
         viewModelScope.launch {
-            toggleFavoriteUseCase(product)
+            toggleFavoriteUseCase(product, onError = {
+                _events.emit(UiEvent.ShowMessage(R.string.error_update_favorite))
+            })
         }
+    }
+
+    sealed interface UiEvent {
+        data class ShowMessage(@StringRes val messageRes: Int) : UiEvent
     }
 }

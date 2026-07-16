@@ -27,6 +27,10 @@ android {
             optIn.add("kotlinx.serialization.InternalSerializationApi")
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {

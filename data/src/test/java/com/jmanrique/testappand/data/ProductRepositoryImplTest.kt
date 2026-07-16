@@ -1,11 +1,11 @@
 package com.jmanrique.testappand.data
 
-import arrow.core.left
 import arrow.core.right
 import com.jmanrique.testappand.core.Failure
 import com.jmanrique.testappand.core.entities.Product
 import com.jmanrique.testappand.data.local.ProductDao
 import com.jmanrique.testappand.data.remote.FakeStoreApi
+import com.jmanrique.testappand.data.remote.responses.ProductResponse
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
@@ -25,16 +25,21 @@ class ProductRepositoryImplTest {
     }
 
     @Test
-    fun `getProducts should return remote products when API call is successful`() = runTest {
+    fun `getProducts should return mapped products when API call is successful`() = runTest {
         // Given
-        val remoteProducts = listOf(Product(1, "Remote", 10.0, "", "", "", null))
-        coEvery { api.getProducts() } returns remoteProducts
+        val remoteResponses = listOf(
+            ProductResponse(1, "Remote", 10.0, "Desc", "Cat", "image", null)
+        )
+        val expectedProducts = listOf(
+            Product(1, "Remote", 10.0, "Desc", "Cat", "image", null, false)
+        )
+        coEvery { api.getProducts() } returns remoteResponses
 
         // When
         val result = repository.getProducts()
 
         // Then
-        assertEquals(remoteProducts.right(), result)
+        assertEquals(expectedProducts.right(), result)
     }
 
     @Test

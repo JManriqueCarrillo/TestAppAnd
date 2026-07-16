@@ -5,9 +5,11 @@ import arrow.core.left
 import arrow.core.right
 import com.jmanrique.testappand.core.Failure
 import com.jmanrique.testappand.core.entities.Product
+import com.jmanrique.testappand.core.entities.Rating
 import com.jmanrique.testappand.data.local.ProductDao
 import com.jmanrique.testappand.data.local.entities.FavoriteProductEntity
 import com.jmanrique.testappand.data.remote.FakeStoreApi
+import com.jmanrique.testappand.data.remote.responses.ProductResponse
 import com.jmanrique.testappand.domain.ProductRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -20,7 +22,8 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun getProducts(): Either<Failure, List<Product>> {
         return try {
-            api.getProducts().right()
+            val responses = api.getProducts()
+            responses.map { it.toDomain() }.right()
         } catch (e: Exception) {
             Failure.analyzeException(e).left()
         }
@@ -58,6 +61,17 @@ class ProductRepositoryImpl @Inject constructor(
             Failure.analyzeException(e).left()
         }
     }
+
+    private fun ProductResponse.toDomain() = Product(
+        id = id,
+        title = title,
+        price = price,
+        description = description,
+        category = category,
+        image = image,
+        rating = rating?.let { Rating(it.rate, it.count) },
+        isFavorite = false
+    )
 
     private fun FavoriteProductEntity.toDomain() = Product(
         id = id,

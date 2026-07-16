@@ -1,5 +1,6 @@
 package com.jmanrique.testappand.features.products.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,12 +10,15 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -26,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import com.jmanrique.testappand.features.products.ProductsViewModel
 import com.jmanrique.testappand.features.products.R
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(
@@ -33,8 +38,23 @@ fun ProductsScreen(
     onProductClick: (Int) -> Unit = {}
 ) {
     val state by viewModel.productsState.collectAsState()
+    val context = LocalContext.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is ProductsViewModel.UiEvent.ShowMessage ->
+                    snackbarHostState.showSnackbar(context.getString(event.messageRes))
+            }
+        }
+    }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.title_products), modifier = Modifier.testTag("topAppBarTitle")) }
@@ -47,11 +67,20 @@ fun ProductsScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 is UiState.Error -> {
-                    Text(
-                        text = result.message,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
+                    Column(
+                        modifier = Modifier.align(Alignment.Center).padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = result.message,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = viewModel::loadProducts) {
+                            Text(text = stringResource(R.string.retry))
+                        }
+                    }
                 }
                 is UiState.Success -> {
                     ProductsList(

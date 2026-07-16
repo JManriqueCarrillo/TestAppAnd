@@ -1,9 +1,5 @@
-@file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
 package com.jmanrique.testappand.core.entities
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class Product(
     val id: Int,
     val title: String,
@@ -15,7 +11,6 @@ data class Product(
     val isFavorite: Boolean = false,
 )
 
-@Serializable
 data class Rating(
     val rate: Double,
     val count: Int,
