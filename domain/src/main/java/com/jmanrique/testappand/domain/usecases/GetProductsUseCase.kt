@@ -12,7 +12,7 @@ import javax.inject.Inject
 class GetProductsUseCase @Inject constructor(
     private val repository: ProductRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<List<Product>>(dispatcher) {
+) : BaseUseCase<Either<Failure, List<Product>>>(dispatcher) {
     override suspend fun execute(): Either<Failure, List<Product>> {
         return repository.getProducts()
     }

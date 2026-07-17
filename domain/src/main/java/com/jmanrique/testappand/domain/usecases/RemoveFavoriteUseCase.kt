@@ -12,7 +12,7 @@ import javax.inject.Inject
 class RemoveFavoriteUseCase @Inject constructor(
     private val repository: ProductRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCaseWithParams<Product, Unit>(dispatcher) {
+) : BaseUseCaseWithParams<Product, Either<Failure, Unit>>(dispatcher) {
     override suspend fun execute(params: Product): Either<Failure, Unit> {
         return repository.removeFavorite(params)
     }

@@ -29,16 +29,9 @@ class FavoritesViewModel @Inject constructor(
 
     private fun observeFavorites() {
         viewModelScope.launch {
-            getFavoritesUseCase(
-                onResult = { favoritesFlow ->
-                    favoritesFlow.onEach { favorites ->
-                        _favoritesState.value = UiState.Success(favorites)
-                    }.launchIn(viewModelScope)
-                },
-                onError = { failure ->
-                    _favoritesState.value = UiState.Error(failure.getErrorMessage())
-                }
-            )
+            getFavoritesUseCase().onEach { favorites ->
+                _favoritesState.value = UiState.Success(favorites)
+            }.launchIn(viewModelScope)
         }
     }
 

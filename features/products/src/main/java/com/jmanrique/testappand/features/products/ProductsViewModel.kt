@@ -49,13 +49,9 @@ class ProductsViewModel @Inject constructor(
 
     private fun observeFavorites() {
         viewModelScope.launch {
-            getFavoritesUseCase(
-                onResult = { favoritesFlow ->
-                    favoritesFlow.onEach { favorites ->
-                        _favorites.value = favorites
-                    }.launchIn(viewModelScope)
-                }
-            )
+            getFavoritesUseCase().onEach { favorites ->
+                _favorites.value = favorites
+            }.launchIn(viewModelScope)
         }
     }
 
@@ -72,9 +68,12 @@ class ProductsViewModel @Inject constructor(
 
     fun onFavoriteClick(product: Product) {
         viewModelScope.launch {
-            toggleFavoriteUseCase(product, onError = {
-                _events.emit(UiEvent.ShowMessage(R.string.error_update_favorite))
-            })
+            toggleFavoriteUseCase(product).fold(
+                ifLeft = {
+                    _events.emit(UiEvent.ShowMessage(R.string.error_update_favorite))
+                },
+                ifRight = {}
+            )
         }
     }
 

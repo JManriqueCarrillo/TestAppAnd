@@ -11,7 +11,7 @@ import javax.inject.Inject
 class GetUserProfileUseCase @Inject constructor(
     private val repository: ProductRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCaseWithParams<Int, String>(dispatcher) {
+) : BaseUseCaseWithParams<Int, Either<Failure, String>>(dispatcher) {
     override suspend fun execute(params: Int): Either<Failure, String> =
         repository.getUserProfile(params)
 
