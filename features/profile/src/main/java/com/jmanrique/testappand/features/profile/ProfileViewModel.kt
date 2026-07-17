@@ -43,13 +43,9 @@ class ProfileViewModel @Inject constructor(
 
     private fun observeFavoritesCount() {
         viewModelScope.launch {
-            getFavoritesUseCase(
-                onResult = { favoritesFlow ->
-                    favoritesFlow.onEach { favorites ->
-                        _favoritesCount.value = favorites.size
-                    }.launchIn(viewModelScope)
-                }
-            )
+            getFavoritesUseCase().onEach { favorites ->
+                _favoritesCount.value = favorites.size
+            }.launchIn(viewModelScope)
         }
     }
 }
