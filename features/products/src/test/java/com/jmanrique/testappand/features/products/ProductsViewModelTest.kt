@@ -80,4 +80,20 @@ class ProductsViewModelTest {
             assertEquals("Network Error", (state as UiState.Error).message)
         }
     }
+
+    @Test
+    fun `when load products returns empty list, state should be success with empty list`() = runTest {
+        // Given
+        coEvery { repository.getProducts() } returns emptyList<Product>().right()
+
+        // When
+        viewModel = ProductsViewModel(getProductsUseCase, getFavoritesUseCase, toggleFavoriteUseCase)
+
+        // Then
+        viewModel.productsState.test {
+            val state = awaitItem()
+            assert(state is UiState.Success)
+            assertEquals(0, (state as UiState.Success).data.size)
+        }
+    }
 }

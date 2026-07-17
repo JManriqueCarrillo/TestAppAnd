@@ -64,7 +64,7 @@ class ProductsViewModel @Inject constructor(
             val favoriteIds = favorites.map { it.id }.toSet()
             products.map { it.copy(isFavorite = favoriteIds.contains(it.id)) }
         }.onEach { updatedList ->
-            if (updatedList.isNotEmpty() || _productsState.value is UiState.Loading) {
+            if (updatedList.isNotEmpty() || _productsState.value is UiState.Success) {
                 _productsState.value = UiState.Success(updatedList)
             }
         }.launchIn(viewModelScope)
