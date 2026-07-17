@@ -1,5 +1,6 @@
 package com.jmanrique.testappand.data
 
+import arrow.core.left
 import arrow.core.right
 import com.jmanrique.testappand.core.Failure
 import com.jmanrique.testappand.core.entities.Product
@@ -46,15 +47,13 @@ class ProductRepositoryImplTest {
     fun `getProducts should return failure when API call fails`() = runTest {
         // Given
         val errorMessage = "API error"
-        coEvery { api.getProducts() } throws Exception(errorMessage)
+        val exception = Exception(errorMessage)
+        coEvery { api.getProducts() } throws exception
 
         // When
         val result = repository.getProducts()
 
         // Then
-        assert(result is arrow.core.Either.Left)
-        val failure = (result as arrow.core.Either.Left).value
-        assert(failure is Failure.ApiError)
-        assertEquals(errorMessage, (failure as Failure.ApiError).message)
+        assertEquals(Failure.GenericError(errorMessage, exception).left(), result)
     }
 }
